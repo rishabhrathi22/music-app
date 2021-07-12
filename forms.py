@@ -6,6 +6,11 @@ class RegisterForm(Form):
 	password = PasswordField('Password', [validators.DataRequired(), validators.EqualTo('confirm', message='Passwords do not match')])
 	confirm = PasswordField('Confirm Password')
 
+class LoginForm(Form):
+	email = StringField('Email',[validators.Length(min=6, max=50)])
+	password = PasswordField('Password', [validators.DataRequired()])
 
-# class UploadSongForm(Form):
-# 		
+class UploadSongForm(Form):
+	title = StringField('Title',[validators.Length(min=1, max=50)])
+	artist = StringField('Artist',[validators.Length(min=1, max=50)])
+	album = StringField('Album',[validators.Length(min=1, max=50)])
