@@ -109,29 +109,13 @@ def allsongs():
 
 	conn = sqlite3.connect("database.db")
 	curr = conn.cursor()
-	curr.execute("SELECT * FROM songs")
-	result = curr.fetchall()
-	print(result)
-	conn.commit()
+	result = curr.execute("SELECT * FROM songs WHERE user=?", (session['id'],)).fetchall()
 	conn.close()
 
 	return render_template('dashboard.html', message = message, songs = result)
 
-	# cur=mysql.connection.cursor()
 
-	# result=cur.execute("SELECT * from songs WHERE user_id = %s",[session['id']])
-
-	# songs=cur.fetchall()
-
-	# if result>0:
-	# 	return render_template('dashboard.html',songs=songs)
-	# else:
-	# 	msg="NO PLAYLIST FOUND "
-
-	# return render_template('dashboard.html',msg=msg)
-	# cur.close()
-
-
+# Upload a new song
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -151,13 +135,18 @@ def upload():
 			return render_template('upload.html', error = "No file selected", form = form)
 
 		if file and allowed_file(file.filename):
-			filename = str(session['id']) + secure_filename(file.filename)
-			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
 			try:
 				conn = sqlite3.connect("database.db")
 				curr = conn.cursor()
-				curr.execute("INSERT into songs (title, artist, album, url) values (?,?,?,?)",(title, artist, album, filename))
+				try:
+					last_id = curr.execute('select * from songs').fetchall()[-1][0]
+				except:
+					last_id = 0
+
+				filename = str(last_id + 1) + "-" + title
+				file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+				curr.execute("INSERT into songs (title, artist, album, filename, user) values (?,?,?,?,?)", (title, artist, album, filename, session['id']))
 				conn.commit()
 				conn.close()
 				return redirect(url_for('allsongs', message = "upload"))
@@ -171,6 +160,39 @@ def upload():
 			return redirect(url_for('allsongs', message = "upload"))
 
 	return render_template('upload.html', form = form)
+
+
+# Play song
+@app.route('/play/<songid>')
+def play(songid):
+	conn = sqlite3.connect("database.db")
+	curr = conn.cursor()
+	result = curr.execute("SELECT * FROM songs WHERE id=?", (songid, )).fetchone()
+	conn.close()
+	return render_template('playsong.html', name = result[1], artist = result[2], album = result[3], filename = result[4])
+
+
+# Delete a song
+@app.route('/delete/<songid>')
+@is_logged_in
+def delete(songid):
+	conn = sqlite3.connect("database.db")
+	curr = conn.cursor()
+	result = curr.execute("SELECT * FROM songs WHERE id=? AND user=?", (songid, session['id'])).fetchone()
+
+	if result == None:
+		conn.close()
+		return "<h1>You are not authorized to delete this song.</h1>"
+
+	file = os.path.join(app.config['UPLOAD_FOLDER'], result[4])
+	curr.execute("DELETE FROM songs WHERE id=?", (songid,))
+	conn.commit()
+
+	if os.path.exists(file):
+		os.remove(file)
+
+	conn.close()
+	return redirect(url_for('allsongs', message = "delete"))
 
 
 if __name__ == "__main__":

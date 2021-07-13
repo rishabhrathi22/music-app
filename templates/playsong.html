@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block body %}
+<style>
+    audio {
+        width: 100%;
+    }
+</style>
+
+<div class="container">
+    <h1> {{ name }} </h1>
+    <hr>
+
+    <audio controls>
+        <source src="../static/songs/{{ filename }}" type="audio/mp3" preload="meta">
+        Your browser does not support the audio element.
+    </audio>
+
+</div>
+
+{% endblock %}
