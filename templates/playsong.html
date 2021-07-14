@@ -4,17 +4,49 @@
     audio {
         width: 100%;
     }
+
+    #downloadbtn {
+        background-color: red;
+        color: white;
+        padding: 1em 1.5em;
+        text-decoration: none;
+        text-transform: uppercase;
+    }
 </style>
 
 <div class="container">
-    <h1> {{ name }} </h1>
+    <div class="row">
+        <div class="col-sm-6">
+            <h1> {{ name }} </h1>
+        </div>
+        <div class="col-sm-3" style="margin-top: 3%; text-align: center;">
+            <h4> Artist - <b>{{ artist }}</b> </h4>
+        </div>
+        <div class="col-sm-3" style="margin-top: 3%; text-align: center;">
+            <h4> Album - <b>{{ album }}</b> </h4>
+        </div>
+    </div>
     <hr>
-
-    <audio controls>
-        <source src="../static/songs/{{ filename }}" type="audio/mp3" preload="meta">
-        Your browser does not support the audio element.
-    </audio>
-
+    <div class="row">
+        <div class="col-sm-10 col-sm-offset-1">
+            <audio controls>
+                <source src="../static/songs/{{ filename }}" type="audio/mp3" preload="meta">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+    </div>
+    <br><br>
+    <div class="row" style="text-align: center;">
+        <a href="../static/songs/{{ filename }}" download id="downloadbtn">Download</a>
+    </div>
 </div>
+
+<script>
+    function getName() {
+        return "Working";
+    }
+    console.log("{{filename}}");
+    console.log("{{name}}");
+</script>
 
 {% endblock %}

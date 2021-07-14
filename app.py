@@ -143,7 +143,7 @@ def upload():
 				except:
 					last_id = 0
 
-				filename = str(last_id + 1) + "-" + title
+				filename = str(last_id + 1) + "-" + title + '.mp3'
 				file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
 				curr.execute("INSERT into songs (title, artist, album, filename, user) values (?,?,?,?,?)", (title, artist, album, filename, session['id']))
