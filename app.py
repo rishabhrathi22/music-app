@@ -7,12 +7,12 @@ import os
 from forms import RegisterForm, LoginForm, UploadSongForm
 
 # storing mp3 files
-UPLOAD_FOLDER = 'static/songs'
-ALLOWED_EXTENSIONS = {'mp3'}
+UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static', 'songs')
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
 app.config['SESSION_TYPE'] = 'filesystem'
+
 # Upload folder for songs
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # Max size allowed = 6 MB
@@ -120,7 +120,7 @@ def allsongs():
 
 # Upload a new song
 def allowed_file(filename):
-	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ['mp3']
 
 @app.route('/upload', methods = ['GET', 'POST'])
 @is_logged_in
