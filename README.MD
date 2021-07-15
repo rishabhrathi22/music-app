@@ -1,4 +1,4 @@
-<h1 align="center">MUSIC APP<h1>
+<h1 align="center">FLASK MUSIC APP<h1>
 
 
 <div align="center">
@@ -31,12 +31,10 @@ Install all the requirements.
 
     $ pip install -r requirements.txt
 
-Than, run the application:
+Then, run the application:
 
 	$ python app.py
 
 To see your application, access this url in your browser:
 
 	http://localhost:5000
-
-All configuration is in: `configuration.py`
