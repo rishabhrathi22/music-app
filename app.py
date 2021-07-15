@@ -1,9 +1,8 @@
-from flask import Flask, redirect, url_for, request, render_template, session, send_from_directory
+from flask import Flask, redirect, url_for, request, render_template, session
 from passlib.hash import sha256_crypt
 from functools import wraps
 import sqlite3
 import os
-from werkzeug.utils import secure_filename
 
 from forms import RegisterForm, LoginForm, UploadSongForm
 
@@ -12,9 +11,13 @@ UPLOAD_FOLDER = 'static/songs'
 ALLOWED_EXTENSIONS = {'mp3'}
 
 app = Flask(__name__)
+app.secret_key = 'super secret key'
+app.config['SESSION_TYPE'] = 'filesystem'
+# Upload folder for songs
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # Max size allowed = 6 MB
 app.config['MAX_CONTENT_LENGTH'] = 6 * 1000 * 1000
+
 
 # Home page
 @app.route('/')
