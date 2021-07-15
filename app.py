@@ -7,11 +7,10 @@ import os
 from forms import RegisterForm, LoginForm, UploadSongForm
 
 # storing mp3 files
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, 'static', 'songs')
 
 app = Flask(__name__)
-app.secret_key = 'super secret key'
-app.config['SESSION_TYPE'] = 'filesystem'
 
 # Upload folder for songs
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -30,6 +29,9 @@ def index():
 # Register user
 @app.route('/register', methods = ['GET', 'POST'])
 def register():
+	if 'logged_in' in session:
+		return redirect(url_for("allsongs"))
+
 	form = RegisterForm(request.form)
 
 	if request.method == 'POST' and form.validate():
@@ -43,9 +45,10 @@ def register():
 			curr.execute("INSERT into users (name, email, password) values (?,?,?)",(name,email,password))
 			conn.commit()
 			conn.close()
-			return render_template('register.html', form = form, success = True)
+			return redirect(url_for('login'))
 
-		except:
+		except Exception as e:
+			print(e)
 			conn.rollback()
 			conn.close()
 			return render_template('register.html', form = form, error = "Email already registered")
@@ -117,7 +120,6 @@ def allsongs():
 
 	return render_template('dashboard.html', message = message, songs = result)
 
-
 # Upload a new song
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ['mp3']
@@ -164,7 +166,6 @@ def upload():
 
 	return render_template('upload.html', form = form)
 
-
 # Play song
 @app.route('/play/<songid>')
 def play(songid):
@@ -172,8 +173,11 @@ def play(songid):
 	curr = conn.cursor()
 	result = curr.execute("SELECT * FROM songs WHERE id=?", (songid, )).fetchone()
 	conn.close()
-	return render_template('playsong.html', name = result[1], artist = result[2], album = result[3], filename = result[4])
 
+	if result:
+		return render_template('playsong.html', name = result[1], artist = result[2], album = result[3], filename = result[4])
+
+	return render_template("404.html", message = "Song does not exist")
 
 # Delete a song
 @app.route('/delete/<songid>')
@@ -185,7 +189,7 @@ def delete(songid):
 
 	if result == None:
 		conn.close()
-		return "<h1>You are not authorized to delete this song.</h1>"
+		return render_template("404.html", message = "You are not authorized to delete this song")
 
 	file = os.path.join(app.config['UPLOAD_FOLDER'], result[4])
 	curr.execute("DELETE FROM songs WHERE id=?", (songid,))

@@ -29,8 +29,8 @@
 	<table class="table table-stripped table-hover" id="allSongs">
 		<thead>
 			<tr>
-				<th width="40%">Title</th>
-				<th width="20%">Artist</th>
+				<th width="20%">Title</th>
+				<th width="40%">Artist</th>
 				<th width="20%">Album</th>
 				<th width="10%"></th>
 				<th width="10%"></th>
@@ -39,8 +39,8 @@
 		<tbody>
 			{% for song in songs %}
 			<tr>
-				<td width="40%"><a href="play/{{song.0}}">{{song.1}}</a></td>
-				<td width="20%">{{song.2}}</td>
+				<td width="20%"><a href="play/{{song.0}}">{{song.1}}</a></td>
+				<td width="40%">{{song.2}}</td>
 				<td width="20%">{{song.3}}</td>
 				<td width="10%"><a href="play/{{song.0}}" class="btn btn-success pull-right">PLAY</a></td>
 				<td width="10%">
